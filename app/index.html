@@ -26,7 +26,7 @@
                         <form>
                             <label for="keywords">Enter keyword number</label>
                             <div class="input-group mb-3">
-                                <input type="number" class="form-control">
+                                <input type="number" class="form-control" id="numberKeyword" value="3">
                                 <div class="input-group-append">
                                     <button class="btn btn-outline-secondary" type="button" id="randomKeyword">Random</button>
                                 </div>
@@ -43,7 +43,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Start</button>
+                            <button type="button" class="btn btn-primary" id="ready">Are you ready ?</button>
                         </form>
                     </div>
                 </div>
@@ -65,8 +65,32 @@
                </div>
            </div>
         </div>
+        <br>
+        <div class="row" id="divResult" style="display: none">
+            <div class="col-sm-12">
+                <div class="card">
+                    <h5 class="card-header">Ready</h5>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-5" id="vietnamese_result">
+                                <label>Vietnamese</label>
+                            </div>
+                            <div class="col-sm-5" id="english_result">
+                                <label >English</label>
+
+                            </div>
+                            <div class="col-sm-2" id="result">
+                                <label >Result</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
     </div>
+
 </body>
 </html>
