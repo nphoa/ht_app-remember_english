@@ -17,6 +17,7 @@
     <div class="container">
         <div class="alert alert-primary" role="alert">
             <h1>Welcome to hack time app --- Remember English Keyword</h1>
+            <h1 id="timerCountdown"></h1>
         </div>
         <div class="row">
             <div class="col-sm-6">
@@ -35,11 +36,11 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <label for="keywords">Enter minute</label>
-                                        <input type="number" class="form-control" id="minute" name="minute">
+                                        <input type="number" class="form-control" id="minute" name="minute" value="0">
                                     </div>
                                     <div class="col-sm-6">
                                         <label for="keywords">Enter seconds</label>
-                                        <input type="number" class="form-control" id="seconds" name="seconds">
+                                        <input type="number" class="form-control" id="seconds" name="seconds" value="0">
                                     </div>
                                 </div>
                             </div>
@@ -88,7 +89,36 @@
                 </div>
             </div>
         </div>
+        <div class="row" id="score" style="display: none">
+            <div class="col-sm-12">
+                <div class="card">
+                    <h5 class="card-header">Score</h5>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12" id="">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Keywords</th>
+                                        <th scope="col">Correct keywords</th>
+                                        <th scope="col">Error keywords</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr id="score_summary">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
 
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 

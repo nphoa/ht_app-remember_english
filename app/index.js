@@ -23,6 +23,8 @@ $(document).ready(function () {
             $("div#infoKeywords").css('display','');
         });
     $("#ready").on('click',function () {
+        clearForm();
+        console.log(keywords);
         $("div#infoKeywords").css('display','none');
         $("div#divResult").css('display','');
         let number_div_english_result = $("div#english_result");
@@ -33,10 +35,25 @@ $(document).ready(function () {
             number_div_vietnamese_result.append(input_vietnamese_result);
             let input_english_result = `<input type="text" class="form-control test1" data-id="${keywords[i].id}" onkeyup="check(this)"> <br>`;
             number_div_english_result.append(input_english_result);
-            let divResult = `<div class="" role="alert" data-id="${keywords[i].id}" style="display: none"></div>`;
+            let divResult = `<div class="" role="alert" data-id="${keywords[i].id}" data-result="false" style="display: none"></div>`;
             div_result.append(divResult);
         }
+
+        let minute = $("#minute").val();
+        let seconds = $("#seconds").val();
+        console.log(minute,seconds);
+        let time = (parseInt(minute) * 60) + parseInt(seconds);
+        commonModule.startCountdownTimer(time,$("#timerCountdown")).then(res => {
+            if(res == 'resolved'){
+                alert('Game finish');
+                $("div#divResult").css('display','none');
+                finishGame();
+            }
+
+        });
     });
+
+
 });
 function check(e) {
     let id_keyword = $(e).attr('data-id');
@@ -50,10 +67,32 @@ function check(e) {
     selector.removeClass();
     if(check){
         selector.addClass('alert alert-success');
+        selector.attr('data-result','true');
         selector.text('Correct');
     }else{
         selector.addClass('alert alert-danger');
         selector.text('Error');
     }
     selector.css('display','');
+}
+
+function clearForm() {
+    $("#english").find("input,br").remove();
+    $("#vietnamese").find("input,br").remove();
+}
+function finishGame() {
+    keywords = [];
+    $("#vietnamese_result").find("input,br").remove();
+    $("#english_result").find("input,br").remove();
+
+    //Show score
+    let number_correct_result = $("#result").find("div[data-result=true]").length;
+    let number_error_result = $("#result").find("div[data-result=false]").length;
+    //console.log(number_error_result);
+    let domTr = $("div#score").find("table").find("tr#score_summary");
+    domTr.find("td:eq(0)").text(number_keyword);
+    domTr.find("td:eq(1)").text(number_correct_result);
+    domTr.find("td:eq(2)").text(number_error_result);
+    $("div#score").css('display','');
+    $("#result").find("div").remove();
 }
