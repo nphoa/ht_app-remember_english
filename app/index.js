@@ -13,25 +13,30 @@ $(document).ready(function () {
             if (number_div_english.find('input').length == number_keyword){
                 return;
             }
-            keywords = keywordModule.randomKeyWord(number_keyword);
-            for (let i = 0; i < keywords.length; i++) {
-                let input_english = `<input type="text" class="form-control" value="${keywords[i].keyword}" > <br>`;
-                number_div_english.append(input_english);
-                let input_vietnamese = `<input type="text" class="form-control" value="${keywords[i].vietnames}" > <br>`;
-                number_div_vietnamese.append(input_vietnamese);
-            }
+            let dataPromiseAPI = keywordModule.randomKeyWord(number_keyword);
+            dataPromiseAPI.then(res => showDataCallBack(res,number_div_english,number_div_vietnamese));
             $("div#infoKeywords").css('display','');
         });
     $("#ready").on('click',function () {
+        keywordModule.changeRandomPositionInArrayObject(keywords);
+        let minute = $("#minute").val();
+        let seconds = $("#seconds").val();
+        if (minute == 0 && seconds == 0) {
+            alert('You must enter minute or seconds !');
+            return;
+        }
+        if (keywords.length == 0){
+            alert('You must random keywords !');
+            return;
+        }
         clearForm();
-        console.log(keywords);
         $("div#infoKeywords").css('display','none');
         $("div#divResult").css('display','');
         let number_div_english_result = $("div#english_result");
         let number_div_vietnamese_result = $("div#vietnamese_result");
         let div_result = $("div#result");
         for (let i = 0; i < keywords.length; i++) {
-            let input_vietnamese_result = `<input type="text" class="form-control" data-id="${keywords[i].id}" value="${keywords[i].vietnames}" readonly> <br>`;
+            let input_vietnamese_result = `<input type="text" class="form-control" data-id="${keywords[i].id}" value="${keywords[i].vietnamese}" readonly> <br>`;
             number_div_vietnamese_result.append(input_vietnamese_result);
             let input_english_result = `<input type="text" class="form-control test1" data-id="${keywords[i].id}" onkeyup="check(this)"> <br>`;
             number_div_english_result.append(input_english_result);
@@ -39,9 +44,6 @@ $(document).ready(function () {
             div_result.append(divResult);
         }
 
-        let minute = $("#minute").val();
-        let seconds = $("#seconds").val();
-        console.log(minute,seconds);
         let time = (parseInt(minute) * 60) + parseInt(seconds);
         commonModule.startCountdownTimer(time,$("#timerCountdown")).then(res => {
             if(res == 'resolved'){
@@ -52,9 +54,23 @@ $(document).ready(function () {
 
         });
     });
-
+    $("#reset").on('click',function () {
+        let domTrScore = $("div#score").find("table").find("tr#score_summary");
+        $(domTrScore).find('td').text('');
+        $("div#score").css('display','none');
+    });
 
 });
+function showDataCallBack(data,number_div_english,number_div_vietnamese) {
+    keywords = data;
+    for (let i = 0; i < keywords.length; i++) {
+        let input_english = `<input type="text" class="form-control" value="${keywords[i].keyword}" > <br>`;
+        number_div_english.append(input_english);
+        let input_vietnamese = `<input type="text" class="form-control" value="${keywords[i].vietnamese}" > <br>`;
+        number_div_vietnamese.append(input_vietnamese);
+    }
+
+}
 function check(e) {
     let id_keyword = $(e).attr('data-id');
     let result = $(e).val();
