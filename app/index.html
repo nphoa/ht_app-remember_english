@@ -122,6 +122,26 @@
         </div>
 
     </div>
-
+    <script>
+        function User() {
+            var username, password;
+            function doLogin(user, pw) {
+                username = user;
+                password = pw;
+            }
+            function getUsername() {
+                return username;
+            }
+            var publicAPI = {
+                login : doLogin,
+                getUsername:getUsername,
+                username:username
+            };
+            return publicAPI ;
+        }
+        var userInstance = User();
+        userInstance.login('nph','123');
+        console.log(userInstance.getUsername());
+    </script>
 </body>
 </html>

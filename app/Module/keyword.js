@@ -25,21 +25,23 @@ var keywordModule = (function () {
        return randomArrs;
     }
     function changeRandomPositionInArrayObject(data) {
-        console.log(data);
-        let countArray = data.length;
+        let countArray = (data.length) -1;
+        let iFor = countArray;
         let newArrayData = [];
-        for (let i =0 ;i <= countArray ; i ++){
-            let numberRandom = commonModule.getRandomIntInclusive(1,countArray);
+        for (let i =0 ;i <= iFor ; i ++){
+            let numberRandom = commonModule.getRandomIntInclusive(0,countArray);
+            let eleFind = data[numberRandom];
             if(newArrayData.length > 0){
-                let eleExist = newArrayData.find(element => element.id == numberRandom);
-                if(eleExist != undefined){
-                    count++;
+                //let eleExist = data[numberRandom];
+                let check = newArrayData.find(element => element.id == eleFind.id);
+                if(check != undefined){
+                    iFor++;
                     continue;
                 }
             }
-            let eleFind = res.find(element => element.id == numberRandom);
-            randomArrs.push(eleFind);
+            newArrayData.push(eleFind);
         }
+        return newArrayData;
     }
     return {
         changeRandomPositionInArrayObject:changeRandomPositionInArrayObject,

@@ -15,10 +15,10 @@ $(document).ready(function () {
             }
             let dataPromiseAPI = keywordModule.randomKeyWord(number_keyword);
             dataPromiseAPI.then(res => showDataCallBack(res,number_div_english,number_div_vietnamese));
-            $("div#infoKeywords").css('display','');
+            $("div#infoKeywords").slideDown("slow");
         });
     $("#ready").on('click',function () {
-        keywordModule.changeRandomPositionInArrayObject(keywords);
+        let keywordsAfterChangePosition = keywordModule.changeRandomPositionInArrayObject(keywords);
         let minute = $("#minute").val();
         let seconds = $("#seconds").val();
         if (minute == 0 && seconds == 0) {
@@ -29,18 +29,17 @@ $(document).ready(function () {
             alert('You must random keywords !');
             return;
         }
-        clearForm();
         $("div#infoKeywords").css('display','none');
         $("div#divResult").css('display','');
         let number_div_english_result = $("div#english_result");
         let number_div_vietnamese_result = $("div#vietnamese_result");
         let div_result = $("div#result");
-        for (let i = 0; i < keywords.length; i++) {
-            let input_vietnamese_result = `<input type="text" class="form-control" data-id="${keywords[i].id}" value="${keywords[i].vietnamese}" readonly> <br>`;
+        for (let i = 0; i < keywordsAfterChangePosition.length; i++) {
+            let input_vietnamese_result = `<input type="text" class="form-control" data-id="${keywordsAfterChangePosition[i].id}" value="${keywordsAfterChangePosition[i].vietnamese}" readonly> <br>`;
             number_div_vietnamese_result.append(input_vietnamese_result);
-            let input_english_result = `<input type="text" class="form-control test1" data-id="${keywords[i].id}" onkeyup="check(this)"> <br>`;
+            let input_english_result = `<input type="text" class="form-control test1" data-id="${keywordsAfterChangePosition[i].id}" onkeyup="check(this)"> <br>`;
             number_div_english_result.append(input_english_result);
-            let divResult = `<div class="" role="alert" data-id="${keywords[i].id}" data-result="false" style="display: none"></div>`;
+            let divResult = `<div class="" role="alert" data-id="${keywordsAfterChangePosition[i].id}" data-result="false" style="display: none"></div>`;
             div_result.append(divResult);
         }
 
@@ -58,15 +57,16 @@ $(document).ready(function () {
         let domTrScore = $("div#score").find("table").find("tr#score_summary");
         $(domTrScore).find('td').text('');
         $("div#score").css('display','none');
+        clearForm();
     });
 
 });
 function showDataCallBack(data,number_div_english,number_div_vietnamese) {
     keywords = data;
     for (let i = 0; i < keywords.length; i++) {
-        let input_english = `<input type="text" class="form-control" value="${keywords[i].keyword}" > <br>`;
+        let input_english = `<input type="text" class="form-control" disabled value="${keywords[i].keyword}" > <br>`;
         number_div_english.append(input_english);
-        let input_vietnamese = `<input type="text" class="form-control" value="${keywords[i].vietnamese}" > <br>`;
+        let input_vietnamese = `<input type="text" class="form-control" disabled value="${keywords[i].vietnamese}" > <br>`;
         number_div_vietnamese.append(input_vietnamese);
     }
 
@@ -93,6 +93,7 @@ function check(e) {
 }
 
 function clearForm() {
+    $("div#infoKeywords").css('display','none');
     $("#english").find("input,br").remove();
     $("#vietnamese").find("input,br").remove();
 }
@@ -111,4 +112,7 @@ function finishGame() {
     domTr.find("td:eq(2)").text(number_error_result);
     $("div#score").css('display','');
     $("#result").find("div").remove();
+
+    //Show again information keywords
+    $("div#infoKeywords").css('display','');
 }
