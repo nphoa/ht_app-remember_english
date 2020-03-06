@@ -13,7 +13,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="../Module/common.js"></script>
     <script src="index.js"></script>
-
+    <script src="Class/Player.js"></script>
 </head>
 <body>
 <div class="container">
@@ -24,18 +24,14 @@
     <div class="row">
         <div class="col-sm-6">
             <div class="card">
-                <h5 class="card-header">Thông tin người chơi</h5>
+                <h5 class="card-header">Đăng ký thông tin người chơi</h5>
                 <div class="card-body">
                     <form>
                         <div class="form-group">
                             <label for="randomQuestion">Nhập tên</label>
                             <input type="email" class="form-control" id="username">
                         </div>
-                        <div class="form-group">
-                            <label for="randomQuestion">Số điểm hiện có</label>
-                            <input type="number" class="form-control" id="score" value="0">
-                        </div>
-
+                        <button type="button" class="btn btn-primary" id="registerPlayer">Register</button>
                     </form>
                 </div>
             </div>
@@ -61,6 +57,21 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <h5 class="card-header">Thông tin những người chơi</h5>
+                <div class="card-body">
+                    <div class="col-sm-12" id="infoPlayers" style="display: flex">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
     <br>
     <div class="row" style="display: none" id="infoResult">
         <div class="col-sm-12">
@@ -124,7 +135,7 @@
                     </div>
                     <div style="margin-top: 15px;border: 1px solid;height: 70px;padding: 15px;display: block;text-align: center">
                         <button type="button" class="btn btn-danger" id="quayluot">Quay lượt</button>
-                        <span class="wow wobble" style="display: none" id="divWow">
+                        <span class="wow wobble" style="display: none" id="divHandleScore">
                             Content to Reveal Here
                         </span>
                     </div>
@@ -137,13 +148,41 @@
 <script src="./dist/wow.min.js"></script>
 <script>
     $("#quayluot").on('click',function () {
-        $("span#divWow").slideDown('slow');
+        let handel = appModule.getRandomQuayLuot();
+        $("span#divHandleScore").text(handel.name);
+        $("span#divHandleScore").slideDown('slow');
+        //console.log(appModule.getPlayers()[0]);
+        appModule.handleActionByKeyMap(handel.handle,appModule.getPlayerActive());
+        console.log(handel.handle,appModule.getPlayers()[0]);
+
     });
     $(document).ready(function () {
         let optionsTitle = '';
         for(const title of appModule.title){
             optionsTitle += `<option data-id=${title.id} value=${title.id}>${title.name}</option>`
         }
+        $("#registerPlayer").on('click',function () {
+            let name = $("#username").val();
+            let player = new Player(appModule.getPlayers().length + 1,name,0,false);
+            appModule.addNewPlayer(player);
+            let playerDom = `
+                      <div class="card" style="width: 14rem;margin-left: 10px">
+                            <img class="card-img-top" src="./dist/user-roles-wordpress.png" alt="Card image cap" height="200px">
+                            <div class="card-body">
+                               <div style="">
+                                    <p>
+                                        Name: <span style="font-weight: bold">${player.name}</span>
+                                    </p>
+                                    <p>
+                                        Score:<span style="font-weight: bold" data-id=${player.id}>${player.score}</span>
+                                    </p>
+                               </div>
+                            </div>
+                        </div>
+
+            `;
+            $("#infoPlayers").append(playerDom);
+        });
         $("select#chooseTitle").append(optionsTitle);
 
         $("select#chooseTitle").on('change',function () {
@@ -158,34 +197,39 @@
             let divsResultCharacter = '';
             for (let i =0;i<arrCharacters.length;i++){
                 divsResultCharacter += `
-                    <div style="width: 70px;height: 70px;border: 2px solid #8A0886;position: relative;display: inline-block" data-character=${arrCharacters[i]}>
+                    <div style="width: 70px;height: 70px;border: 2px solid #8A0886;position: relative;display: inline-block" data-character=${arrCharacters[i].toUpperCase()}>
                           <span style="position: absolute;font-size: 50px;padding-left: 15px"></span>
                     </div>
-
                 `;
             }
             $("#divResult").append(divsResultCharacter);
+
+            appModule.getPlayers()[0].active = true;
             //console.log(countCharacter);
         });
 
         $("li.letter").on('click',function () {
             let character = $(this).text();
-            let elementDivResult = $("div#divResult").children();
-            $(elementDivResult).each((index,ele) => {
-                console.log($(ele).attr('data-character').toUpperCase());
-                console.log(character.toUpperCase());
-                if ($(ele).attr('data-character').toUpperCase() ==  character.toUpperCase() ){
-                    alert('Có một chữ : '+ character);
-                    $(ele).children().text(character);
-                    return ;
-                }else{
-                    alert('Không có chữ : '+ character);
-                    return ;
-                }
-                console.log($(ele).attr('data-character'));
-            });
+            let divCharacters = $(`div[data-character=${character.toUpperCase()}]`);
+            let elementDivResult = $("div#divResult").find(divCharacters);
 
+            if (elementDivResult.length > 0 && appModule.checkCharacterExsit(character)){
+                alert(`Có ${elementDivResult.length} chữ ${character}`);
+                appModule.addCountCharacterResult(elementDivResult.length);
+                $(elementDivResult).each((index,ele) => {
+                    $(ele).children().text(character);
+                });
+                //check winner
+               if(appModule.removeCharacterAfterChoose(character).length == 0){
+                    alert('Bạn đã chiến thắng !');
+               }
+                //end
+            }else{
+                alert(`Không có chữ ${character} nào !`);
+            }
         });
+
+
     });
 </script>
 </body>
