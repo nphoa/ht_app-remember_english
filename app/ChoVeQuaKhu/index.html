@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="../Module/common.js"></script>
+    <script src="index.js"></script>
+
+</head>
+<body>
+<div class="container">
+    <div class="alert alert-primary" role="alert">
+        <h1>Welcome to hack time app --- Chở về qúa khứ</h1>
+        <h1 id="timerCountdown"></h1>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <h5 class="card-header">Hiện tại</h5>
+                <div class="card-body">
+                    <form>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="current_1" value="1" disabled style="width: 200px">
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="current_2" value="2" disabled style="width: 400px">
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="current_3" value="3" disabled style="width: 600px">
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="current_4" value="4" disabled style="width: 800px">
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="current_5" value="5" disabled>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-6">
+            <button type="button" class="btn btn-primary" id="enterThePast">Ngược về quá khứ...</button>
+        </div>
+    </div>
+    <br>
+    <div class="row" id="past" style="display: none">
+        <div class="col-sm-12">
+            <div class="card">
+                <h5 class="card-header">Quá khứ...</h5>
+                <div class="card-body">
+                    <form id="formThePast">
+                        <div class="form-group">
+                            <input type="text" class="form-control result" data-position="1" data-current="1" style="width: 200px;display: inline-block" disabled>
+                            <button type="button" class="btn btn-outline-info guess">Dự đoán...</button>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control result" data-position="2" data-current="2" style="width: 400px;display: inline-block" disabled>
+                            <button type="button" class="btn btn-outline-info guess">Dự đoán...</button>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control result" data-position="3" data-current="3"  style="width: 600px;display: inline-block"  disabled>
+                            <button type="button" class="btn btn-outline-info guess">Dự đoán...</button>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control result" data-position="4" data-current="4" style="width: 800px;display: inline-block" disabled>
+                            <button type="button" class="btn btn-outline-info guess">Dự đoán...</button>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control result" data-position="5" data-current="5" style="width: 960px;display: inline-block" disabled>
+                            <button type="button" class="btn btn-outline-info guess">Dự đoán...</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#enterThePast").on('click',function () {
+            let numberSupposeRandom = commonModule.getRandomIntInclusive(1,5);
+            console.log(numberSupposeRandom);
+            $("form#formThePast").find(`input[data-position=${numberSupposeRandom}]`).attr('data-suppose','1').val(1);
+            let spanDom = `
+                <span style="padding-left: 10px;font-weight: bold">
+                          Nếu đây sẽ là số 1
+                </span>
+            `;
+            $("form#formThePast").find(`input[data-position=${numberSupposeRandom}]`).parent().append(spanDom);
+            $("form#formThePast").find(`input[data-position=${numberSupposeRandom}]`).parent().find("button").remove();
+            let htmlSuppose = $("form#formThePast").find("input[data-suppose]");
+            let numberCurrent = $(htmlSuppose).attr('data-current');
+            console.log(numberCurrent);
+            app.addPastNumber(numberCurrent);
+            //console.log($(htmlSuppose).attr('data-current'));
+            $("div#past").slideDown('slow');
+
+        });
+
+        $("button.guess").on('click',function () {
+            let inputDom = $(this).parent().find("input");
+            inputDom.removeAttr('disabled');
+            // if(app.getPastNumber().length == 0){
+            //     console.log(inputDom.attr('data-current'));
+            //     app.addPastNumber(inputDom.attr('data-current'));
+            // }
+        });
+
+        $("input.result").on('keyup',function () {
+            console.log($(this).val());
+            console.log(app.getPastNumber()[0]);
+            if ($(this).val() == app.getPastNumber()[0]){
+                alert('correct');
+                app.deleteAll();
+                app.addPastNumber($(this).attr('data-current'));
+            }else{
+                alert('Méo correct');
+            }
+            console.log($(this).val());
+        });
+    });
+</script>
+</body>
+</html>

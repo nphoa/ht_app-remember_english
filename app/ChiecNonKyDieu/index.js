@@ -26,31 +26,36 @@ let appModule =  (function () {
             id:1,
             idTitle:5,
             question:'Tổng thống mỹ hiện thời là ai ?',
-            answer:'DonalTrump'
+            answer:'DonalTrump',
+            vietnamese:'DonalTrump'
         },
         {
             id:2,
             idTitle:2,
             question:'Em gái của Thuý Kiều tên gì ?',
-            answer:'ThuyVan'
+            answer:'ThuyVan',
+            vietnamese:'Thuý Vân'
         },
         {
             id:3,
             idTitle:2,
             question:'Ai là tác giả của tiểu phẩm Lão Hạc ?',
-            answer:'Namcao'
+            answer:'Namcao',
+            vietnamese:'Nam cao'
         },
         {
             id:4,
             idTitle:4,
             question:'Exciter là dòng xe phổ thông nổi tiếng của hãng nào ? ',
-            answer:'Yamaha'
+            answer:'Yamaha',
+            vietnamese:'Yamaha'
         },
         {
             id:5,
             idTitle:2,
             question:'Văn bản “Con rồng cháu tiên” thuộc thể loại văn học dân gian nào ?',
-            answer:'Truyenthuyet '
+            answer:'Truyenthuyet ',
+            vietnamese:'Truyền thuyết '
         }
 
 ];
@@ -99,7 +104,8 @@ let appModule =  (function () {
         ],
         [
             'MatLuot' , (player) => {
-                player.active = false;
+                //player.active = false;
+            changeStatusActive(player);
             }
         ]
 
@@ -129,6 +135,9 @@ let appModule =  (function () {
     }
     function getQuestionRandomByTitle() {
         return questionRamdomByTitle;
+    }
+    function getQuestionRamdomByTitle_Handle_Arr() {
+        return questionRamdomByTitle_Handle_Arr;
     }
     function addCountCharacterResult(numberCharacter) {
         return countCharacterResult += numberCharacter;
@@ -161,34 +170,59 @@ let appModule =  (function () {
         return players;
     }
     function getRandomQuayLuot() {
-        let keyRandom = commonModule.getRandomIntInclusive(0,4);
+        let keyRandom = commonModule.getRandomIntInclusive(0,1);
         return score[keyRandom];
     }
     function handleActionByKeyMap(key,player) {
         let action = handleActions.get(key);
         action(player);
+
     }
     function getPlayerActive() {
         let player = players.find( player => player.active == true );
         return player;
     }
-    function changeStatusActive(playerActive) {
-       // let playerActive = players.find( player => player.active == true );
-        let idChange = playerActive.id;
+    function changeStatusActive(playerCurrentActive) {
+        let idChange = playerCurrentActive.id;
         if(idChange == players.length){
             idChange = 1;
         }else{
             idChange += 1;
         }
-        playerActive.active.active = false;
-        let playerChangeActive = players.find( player => player.id == idChange );
-        playerChangeActive.active = true;
+        updatePlayerByProps(playerCurrentActive,{'active':false,'turn':false});
+        let playerNewActive = players.find( player => player.id == idChange );
+        updatePlayerByProps(playerNewActive,{'active':true,'turn':false});
+    }
+    function updatePlayerByProps(player,propO) {
+        for (let [prop,value] of Object.entries((propO))){
+            player[prop] = value;
+        }
+    }
+    function getPlayerHaveMaxScore() {
+        let max = players[0].score;
+        let playerMax = players[0];
+        for(const player of players){
+            if (player.score > max){
+                max = player.score;
+                playerMax = player
+            }
+        }
+        return playerMax;
+    }
+    function resetGame() {
+         questionRamdomByTitle = null;
+         questionRamdomByTitle_Handle_Arr = null;
+         countCharacterResult = 0;
+         for (const player of players){
+             updatePlayerByProps(player,{score :0,turn:false});
+         }
     }
     return{
         title:title,
         question_answer:question_answer,
         getQuestionByTitle:getQuestionByTitle,
         getQuestionRandomByTitle:getQuestionRandomByTitle,
+        getQuestionRamdomByTitle_Handle_Arr:getQuestionRamdomByTitle_Handle_Arr,
         addCountCharacterResult:addCountCharacterResult,
         getCountCharacterResult:getCountCharacterResult,
         checkCharacterExsit:checkCharacterExsit,
@@ -198,7 +232,10 @@ let appModule =  (function () {
         getRandomQuayLuot:getRandomQuayLuot,
         handleActionByKeyMap:handleActionByKeyMap,
         getPlayerActive:getPlayerActive,
-        changeStatusActive:changeStatusActive
+        changeStatusActive:changeStatusActive,
+        updatePlayerByProps:updatePlayerByProps,
+        getPlayerHaveMaxScore:getPlayerHaveMaxScore,
+        resetGame:resetGame
 
     }
 })();

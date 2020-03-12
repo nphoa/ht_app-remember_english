@@ -81,6 +81,12 @@
                     <div id="divResult">
 
                     </div>
+                    <div style="margin-top: 15px;border: 1px solid;height: 70px;padding: 15px;display: block;text-align: center">
+                        <button type="button" class="btn btn-danger" id="quayluot">Quay lượt</button>
+                        <span class="wow wobble" style="display: none" id="divHandleScore">
+                            Content to Reveal Here
+                        </span>
+                    </div>
                     <div style="padding: 40px;border: 1px solid;height: 220px">
                         <ul id="keyboard">
                             <li class="tab"></li>
@@ -133,12 +139,27 @@
 
                         </ul>
                     </div>
-                    <div style="margin-top: 15px;border: 1px solid;height: 70px;padding: 15px;display: block;text-align: center">
-                        <button type="button" class="btn btn-danger" id="quayluot">Quay lượt</button>
-                        <span class="wow wobble" style="display: none" id="divHandleScore">
-                            Content to Reveal Here
-                        </span>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row" style="display:none" id="Result">
+        <div class="col-sm-12">
+            <div class="card">
+                <h5 class="card-header">Kết quả</h5>
+                <div class="card-body">
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">Chúc mừng !!!</h4>
+                        <p>
+                            Câu trả lời : <span style="font-weight: bold" id="answerResult"></span>
+                        </p>
+                        <hr>
+                        <p class="mb-0" id="winnerPlayer">
+                        </p>
                     </div>
+
                 </div>
 
             </div>
@@ -148,13 +169,21 @@
 <script src="./dist/wow.min.js"></script>
 <script>
     $("#quayluot").on('click',function () {
+        if (appModule.getPlayerActive().turn == true){
+            alert('Ban da quay so ! Hay chon tu khoa !');
+            return;
+        }
         let handel = appModule.getRandomQuayLuot();
         $("span#divHandleScore").text(handel.name);
         $("span#divHandleScore").slideDown('slow');
         //console.log(appModule.getPlayers()[0]);
         appModule.handleActionByKeyMap(handel.handle,appModule.getPlayerActive());
-        console.log(handel.handle,appModule.getPlayers()[0]);
-
+        updateDivScore();
+        if (handel.handle == 'MatLuot'){
+            changeActivePlayerDiv();
+            return;
+        }
+        appModule.getPlayerActive().turn = true;
     });
     $(document).ready(function () {
         let optionsTitle = '';
@@ -163,12 +192,16 @@
         }
         $("#registerPlayer").on('click',function () {
             let name = $("#username").val();
-            let player = new Player(appModule.getPlayers().length + 1,name,0,false);
+            if (name == ''){
+                alert('Ban phai nhap vao ten ');
+                return;
+            }
+            let player = new Player(appModule.getPlayers().length + 1,name,0,false,false);
             appModule.addNewPlayer(player);
             let playerDom = `
                       <div class="card" style="width: 14rem;margin-left: 10px">
                             <img class="card-img-top" src="./dist/user-roles-wordpress.png" alt="Card image cap" height="200px">
-                            <div class="card-body">
+                            <div class="card-body" id=p_${player.id}>
                                <div style="">
                                     <p>
                                         Name: <span style="font-weight: bold">${player.name}</span>
@@ -179,7 +212,6 @@
                                </div>
                             </div>
                         </div>
-
             `;
             $("#infoPlayers").append(playerDom);
         });
@@ -191,24 +223,23 @@
         });
 
         $("button#ready").on('click',function () {
-            $("div#infoResult").slideDown('slow');
-            let question = appModule.getQuestionRandomByTitle();
-            let arrCharacters = [...question.answer.trim()];
-            let divsResultCharacter = '';
-            for (let i =0;i<arrCharacters.length;i++){
-                divsResultCharacter += `
-                    <div style="width: 70px;height: 70px;border: 2px solid #8A0886;position: relative;display: inline-block" data-character=${arrCharacters[i].toUpperCase()}>
-                          <span style="position: absolute;font-size: 50px;padding-left: 15px"></span>
-                    </div>
-                `;
+            if(appModule.getQuestionRandomByTitle() == null){
+                alert('Hãy chon random cau hoi');
+                return;
             }
-            $("#divResult").append(divsResultCharacter);
-
-            appModule.getPlayers()[0].active = true;
-            //console.log(countCharacter);
+            if (appModule.getPlayers().length == 0){
+                alert('Hãy nhập thông tin người chơi');
+                return;
+            }
+            initGame();
         });
 
         $("li.letter").on('click',function () {
+            let playerActive = appModule.getPlayerActive();
+            if(playerActive.turn == false){
+                alert('Bạn phải quay số trước !');
+                return;
+            }
             let character = $(this).text();
             let divCharacters = $(`div[data-character=${character.toUpperCase()}]`);
             let elementDivResult = $("div#divResult").find(divCharacters);
@@ -221,16 +252,74 @@
                 });
                 //check winner
                if(appModule.removeCharacterAfterChoose(character).length == 0){
-                    alert('Bạn đã chiến thắng !');
+                   $("#infoResult").slideUp('slow');
+                   let winnerPlayer = appModule.getPlayerHaveMaxScore();
+                    $("span#answerResult").text(appModule.getQuestionRandomByTitle().vietnamese);
+                    let info = `Chúc mừng ${winnerPlayer.name} đã chiến thắng với số điểm : ${winnerPlayer.score}`;
+                    $("p#winnerPlayer").text(info);
+                   $("#Result").slideDown('slow');
+
                }
                 //end
             }else{
                 alert(`Không có chữ ${character} nào !`);
             }
+
+            appModule.changeStatusActive(appModule.getPlayerActive());
+            changeActivePlayerDiv();
+            $("span#divHandleScore").text('');
         });
 
-
+        $("button#reset").on('click',function () {
+            appModule.resetGame();
+            resetHTML();
+            $("#Result").hide();
+        });
     });
+    function changeActivePlayerDiv() {
+        let userActive = appModule.getPlayerActive();
+        let divPlayers = $("#infoPlayers").children();
+        divPlayers.each((index,element) => {
+            $(element).find("div.card-body").css('background-color','white');
+        });
+        $(`div#p_${userActive.id}`).css('background-color','#CEE3F6');
+    }
+    function updateDivScore() {
+        let playerActive = appModule.getPlayerActive();
+        $(`div#p_${playerActive.id}`).find("p:eq(1)").children().text(playerActive.score);
+    }
+    function initGame() {
+        $("div#infoResult").slideDown('slow');
+        let arrCharacters = appModule.getQuestionRamdomByTitle_Handle_Arr();
+        let divsResultCharacter = '';
+        for (let i =0;i<arrCharacters.length;i++){
+            divsResultCharacter += `
+                    <div style="width: 70px;height: 70px;border: 2px solid #8A0886;position: relative;display: inline-block" data-character=${arrCharacters[i].toUpperCase()}>
+                          <span style="position: absolute;font-size: 50px;padding-left: 15px"></span>
+                    </div>
+                `;
+        }
+        $("#divResult").append(divsResultCharacter);
+        appModule.updatePlayerByProps(appModule.getPlayers()[0],{'active':true});
+        changeActivePlayerDiv();
+    }
+    function resetHTML() {
+        let divPlayers = $("#infoPlayers").children();
+        divPlayers.each((index,element) => {
+            $(element).find("div.card-body").css('background-color','white');
+            $(element).find("p:eq(1)").children().text(0);
+        });
+        $("#divResult").empty();
+    }
+    function testObj() {
+        return {
+            prop1:1,
+            prop2:2,
+            prop3:3
+        }
+    }
+    var {prop1,b,c} = testObj();
+    console.log(prop1);
 </script>
 </body>
 </html>

@@ -1,9 +1,11 @@
 class Player {
-    constructor(id,name,score,active) {
+    constructor(id,name,score,active,turn) {
         this._id = id;
         this._name = name;
         this._score = score;
         this._active = active;
+        this._turn = turn;
+
     }
     set id(id){
         this._id = id;
@@ -30,8 +32,11 @@ class Player {
         return this._active;
     }
 
-     handleScore(){
-
+    set turn(turn){
+        this._turn = turn;
+    }
+    get turn(){
+        return this._turn;
     }
 
 }
